@@ -1,0 +1,7 @@
+menuconfig MODULES_RPMSG_UORB
+	bool "rpmsg_uorb"
+	default n
+	depends on BOARD_RPMSG && ORB_COMMUNICATOR
+	---help---
+		uORB bridge to a remote core over rpmsg (NuttX rptun): remote
+		subscriptions and publications on a "rpmsg-uorb" endpoint.
