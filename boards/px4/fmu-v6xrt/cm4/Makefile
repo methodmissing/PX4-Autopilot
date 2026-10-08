@@ -26,7 +26,7 @@ $(error no CM4 application at $(APPDIR))
 endif
 
 SRCS    := $(addprefix $(SRCDIR),startup.c libc.c mu.c rpmsg_remote.c) $(wildcard $(APPDIR)/*.c)
-HDRS    := $(addprefix $(SRCDIR),libc.h mu.h rpmsg_remote.h status.h fault.h memmap.h) $(wildcard $(APPDIR)/*.h)
+HDRS    := $(addprefix $(SRCDIR),libc.h mu.h rpmsg_remote.h status.h fault.h memmap.h) $(wildcard $(APPDIR)/*.h) $(wildcard $(SRCDIR)lib/*.h)
 DEFINES := -DCM4_APP_NAME='"$(APP)"'
 
 # PX4 tree and build directory (generated headers), for applications that need them.
@@ -34,6 +34,7 @@ PX4_SRC   ?= $(SRCDIR)../../../..
 PX4_BUILD ?= $(PX4_SRC)/build/px4_fmu-v6xrt_rpmsg
 
 # Optional per-application fragment: APP_SRCS, APP_INCLUDES, APP_DEFINES.
+# Layers under lib/ are linked by the applications that use them.
 -include $(APPDIR)/app.mk
 SRCS    += $(APP_SRCS)
 DEFINES += $(APP_DEFINES)

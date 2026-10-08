@@ -1,6 +1,7 @@
 #!/bin/sh
 #
-# rpmsg variant: bring up the CM4 before flight modules
+# rpmsg variant: bring up the CM4 and the uORB bridge before flight modules
 #------------------------------------------------------------------------------
 
 remote_core start
+rpmsg_uorb start

@@ -30,36 +30,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 ############################################################################
-
-# Build the CM4 rpmsg remote with the firmware toolchain and register it as a
-# ROMFS extra (/etc/extras/cm4_rpmsg.elf), where the rptun loader reads it.
-
-set(CM4_ELF ${CMAKE_CURRENT_BINARY_DIR}/cm4_rpmsg.elf)
-
-# CONFIG_BOARD_CM4_APP (root Kconfig, BOARD_RPMSG) picks apps/<name>/
-if(NOT CM4_APP)
-	set(CM4_APP basic)
-endif()
-
-file(GLOB CM4_SOURCES CONFIGURE_DEPENDS
-	${CMAKE_CURRENT_SOURCE_DIR}/*.c ${CMAKE_CURRENT_SOURCE_DIR}/*.h
-	${CMAKE_CURRENT_SOURCE_DIR}/lib/*.c ${CMAKE_CURRENT_SOURCE_DIR}/lib/*.h
-	${CMAKE_CURRENT_SOURCE_DIR}/apps/${CM4_APP}/*.c ${CMAKE_CURRENT_SOURCE_DIR}/apps/${CM4_APP}/*.h)
-
-add_custom_command(OUTPUT ${CM4_ELF}
-	COMMAND make --no-print-directory -C ${CMAKE_CURRENT_SOURCE_DIR}
-		CC=${CMAKE_C_COMPILER} STRIP=${CMAKE_STRIP}
-		BUILDDIR=${CMAKE_CURRENT_BINARY_DIR} APP=${CM4_APP}
-		PX4_BUILD=${PX4_BINARY_DIR} PX4_SRC=${PX4_SOURCE_DIR}
-	DEPENDS ${CM4_SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/link.ld.in ${CMAKE_CURRENT_SOURCE_DIR}/Makefile
-		${PX4_SOURCE_DIR}/src/modules/rpmsg_uorb/rpmsg_uorb_proto.h uorb_headers
-	COMMENT "Building CM4 rpmsg remote, application ${CM4_APP}"
-)
-
-add_custom_target(cm4_firmware DEPENDS ${CM4_ELF})
-
-# consumed by ROMFS/CMakeLists.txt, which is processed after the board sources
-set(config_romfs_extra_files ${config_romfs_extra_files} ${CM4_ELF}
-	CACHE INTERNAL "extra ROMFS files" FORCE)
-set(config_romfs_extra_dependencies ${config_romfs_extra_dependencies} cm4_firmware
-	CACHE INTERNAL "extra ROMFS deps" FORCE)
+px4_add_module(
+	MODULE modules__rpmsg_uorb
+	MAIN rpmsg_uorb
+	STACK_MAIN 4096
+	SRCS
+		rpmsg_uorb_main.cpp
+		RpmsgUorbChannel.cpp
+		transport.c
+	DEPENDS
+		px4_platform
+	)
